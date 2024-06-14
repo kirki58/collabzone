@@ -2,7 +2,9 @@ using System.Security.Cryptography;
 using collabzone.DBAccess.Context;
 using collabzone.DBAccess.Repositories;
 using collabzone.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +17,26 @@ if(!File.Exists("key")){
     File.WriteAllBytes("key", privateKey);
 }
 
-builder.Services.AddAuthentication();
+var rsaKey = RSA.Create();
+rsaKey.ImportRSAPrivateKey(File.ReadAllBytes("key"), out _);
+
+builder.Services.AddAuthentication(x =>
+{
+    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(x =>
+{
+    x.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new RsaSecurityKey(rsaKey),
+        ValidateIssuer = true,
+        ValidIssuer = "https://localhost:7217",
+        ValidateAudience = true,
+        ValidAudience = "https://localhost:7217",
+        ValidateLifetime = true
+    };
+});
 builder.Services.AddAuthorization();
 
 builder.Services.AddControllers();

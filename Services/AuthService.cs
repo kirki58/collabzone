@@ -17,6 +17,7 @@ public class AuthService
         var credentials = new SigningCredentials(new RsaSecurityKey(rsaKey), SecurityAlgorithms.RsaSha256);
 
         var token = handler.CreateToken(new SecurityTokenDescriptor(){
+            Audience = "https://localhost:7217",
             Issuer = "https://localhost:7217",
             Subject = GetClaims(user),
             SigningCredentials = credentials,

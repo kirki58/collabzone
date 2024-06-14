@@ -1,6 +1,7 @@
 ﻿using collabzone.DBAccess.Repositories;
 using collabzone.DTOS;
 using collabzone.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace collabzone.Controllers;
@@ -16,6 +17,8 @@ public class UsersController : ControllerBase
         _repository = repository;
         _authService = authService;
     }
+
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
@@ -30,6 +33,7 @@ public class UsersController : ControllerBase
         }
     }
 
+    [Authorize]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id){
         try{
@@ -52,6 +56,7 @@ public class UsersController : ControllerBase
         }
     }
 
+    [Authorize]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, UpdateUserDTO dto){
         try{
