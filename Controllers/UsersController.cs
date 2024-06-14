@@ -1,5 +1,6 @@
 ﻿using collabzone.DBAccess.Repositories;
 using collabzone.DTOS;
+using collabzone.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace collabzone.Controllers;
@@ -9,9 +10,11 @@ namespace collabzone.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly IUserRepository _repository;
-    public UsersController(IUserRepository repository)
+    private readonly AuthService _authService;
+    public UsersController(IUserRepository repository, AuthService authService)
     {
         _repository = repository;
+        _authService = authService;
     }
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
@@ -54,6 +57,17 @@ public class UsersController : ControllerBase
         try{
             await _repository.Update(id, dto);
             return Ok();
+        }
+        catch(Exception ex){
+            return BadRequest(ex.Message);
+        }
+    }
+    [HttpGet("GetToken/{id}")]
+    public async Task<IActionResult> GetJwt(int id){
+        try{
+            var user = await _repository.GetById(id);
+            var token = _authService.GenerateToken(user);
+            return Ok(token);
         }
         catch(Exception ex){
             return BadRequest(ex.Message);
