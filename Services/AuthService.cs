@@ -21,7 +21,7 @@ public class AuthService
             Issuer = "https://localhost:7217",
             Subject = GetClaims(user),
             SigningCredentials = credentials,
-            Expires = DateTime.UtcNow.AddMinutes(30)
+            Expires = DateTime.UtcNow.AddDays(1)
         });
         return handler.WriteToken(token);
     }

@@ -1,8 +1,12 @@
 using System.Security.Cryptography;
 using collabzone.DBAccess.Context;
 using collabzone.DBAccess.Repositories;
+using collabzone.Models;
+using collabzone.Repositories;
 using collabzone.Services;
+using collabzone.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -39,16 +43,22 @@ builder.Services.AddAuthentication(x =>
 });
 builder.Services.AddAuthorization();
 
+// Registering settings
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+
 builder.Services.AddControllers();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddScoped<IVerificationTokenRepository, VerificationTokenRepository>();
+builder.Services.AddTransient<EmailService>();
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin", builder =>
     {
-        builder
-                .WithOrigins(frontendOrigin)
+        builder                                 //test environment
+                .WithOrigins(frontendOrigin, "http://localhost:5500")
                .AllowAnyHeader() 
                .AllowAnyMethod()
                .AllowCredentials();

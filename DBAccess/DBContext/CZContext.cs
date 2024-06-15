@@ -14,4 +14,5 @@ public class CZContext : DbContext
     public DbSet<Project> Projects { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<Users_Project> Users_Projects { get; set; }
+    public DbSet<Verification_token> Verification_tokens { get; set; }
 }

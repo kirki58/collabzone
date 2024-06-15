@@ -6,7 +6,6 @@ namespace collabzone.Models;
 [Table("projects")]
 public class Project : IModel
 {
-    [Required]
     [Key]
     public int Id { get; set; }
 

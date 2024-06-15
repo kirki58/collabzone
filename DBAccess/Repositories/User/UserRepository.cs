@@ -1,6 +1,7 @@
 ﻿using collabzone.DBAccess.Context;
 using collabzone.DTOS;
 using collabzone.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace collabzone.DBAccess.Repositories;
 
@@ -26,7 +27,6 @@ public class UserRepository : BaseRepository<CZContext>, IUserRepository
         }
         catch(Exception ex){
             throw new Exception(ex.Message);
-        
         }
     }
 
@@ -56,7 +56,7 @@ public class UserRepository : BaseRepository<CZContext>, IUserRepository
                 Email = dto.Email,
                 Password_hash = dto.Password_hash
             };
-            _context.Users.Add(user);
+            await _context.Users.AddAsync(user);
             int rowsAffected = await _context.SaveChangesAsync();
             if(rowsAffected == 0){
                 throw new Exception("Failed to create user");
@@ -83,6 +83,17 @@ public class UserRepository : BaseRepository<CZContext>, IUserRepository
             if(rowsAffected == 0){
                 throw new Exception("Failed to update user");
             }
+        }
+        catch(Exception ex){
+            throw new Exception(ex.Message);
+        }
+    }
+
+    public async Task<User?> GetByEmail(string email)
+    {
+        try{
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
+            return user;
         }
         catch(Exception ex){
             throw new Exception(ex.Message);
