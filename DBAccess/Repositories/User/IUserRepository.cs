@@ -10,4 +10,5 @@ public interface IUserRepository : IRepository<User>
     Task Update(int id,  UpdateUserDTO dto);
 
     Task<User?> GetByEmail(string email);
+    Task<User?> GetByName(string name);
 }

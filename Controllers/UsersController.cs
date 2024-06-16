@@ -2,9 +2,12 @@
 using collabzone.DTOS;
 using collabzone.Models;
 using collabzone.Services;
+using collabzone.Settings;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Org.BouncyCastle.Ocsp;
 
 namespace collabzone.Controllers;
 
@@ -32,10 +35,16 @@ public class UsersController : ControllerBase
         try{
             if(string.IsNullOrEmpty(form["registerEmail"]) || string.IsNullOrEmpty(form["registerPassword"]) ||
                string.IsNullOrEmpty(form["validatePassword"]) || string.IsNullOrEmpty(form["registerName"])){
-                return BadRequest("Fields are required");
+                return BadRequest(0);
             }
             if(form["registerPassword"] != form["validatePassword"]){
-                return BadRequest("Passwords do not match");
+                return BadRequest(1);
+            }
+            if(await _repository.GetByEmail(form["registerEmail"]) != null){
+                return BadRequest(2);
+            }
+            if(await _repository.GetByName(form["registerName"]) != null){
+                return BadRequest(3);
             }
             // Hash password
             string hashedPassword = _passwordHasher.HashPassword(null, form["registerPassword"]);
@@ -47,12 +56,11 @@ public class UsersController : ControllerBase
             //Send gd as email
             await _emailService.SendValidationMail(form["registerEmail"], gd);
             
-            //Continue in ValidateEmail
-            Response.Cookies.Append("email", form["registerEmail"], new CookieOptions { Expires = DateTime.Now.AddMinutes(8) });
-            Response.Cookies.Append("password", hashedPassword, new CookieOptions { Expires = DateTime.Now.AddMinutes(8) });
-            Response.Cookies.Append("name", form["registerName"], new CookieOptions { Expires = DateTime.Now.AddMinutes(8) });
+            // Response.Cookies.Append("email", form["registerEmail"], new CookieOptions { Expires = DateTime.Now.AddMinutes(8) });
+            // Response.Cookies.Append("password", hashedPassword, new CookieOptions { Expires = DateTime.Now.AddMinutes(8)});
+            // Response.Cookies.Append("name", form["registerName"], new CookieOptions { Expires = DateTime.Now.AddMinutes(8)});
             
-            return Ok();
+            return Ok(new {Hash = hashedPassword});
         }
         catch(Exception ex){
             return BadRequest(ex.Message);
@@ -63,6 +71,9 @@ public class UsersController : ControllerBase
     [HttpGet("validate-email/{token}")]
     public async Task<IActionResult> ValidateEmail(Guid token){
         try{
+            if(Request.Cookies["email"] == null || Request.Cookies["password"] == null || Request.Cookies["password"] == null) {
+            return BadRequest("Please use the same browser to register and validate email");
+            }
             var verificationToken = await _verificationRepository.GetByToken(token);
             if(verificationToken == null){
                 return NotFound("Token not found");

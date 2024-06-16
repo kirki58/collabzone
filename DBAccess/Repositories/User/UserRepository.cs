@@ -99,4 +99,16 @@ public class UserRepository : BaseRepository<CZContext>, IUserRepository
             throw new Exception(ex.Message);
         }
     }
+
+    public async Task<User?> GetByName(string name)
+    {
+        try{
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Name == name);
+            return user;
+        }
+        catch(Exception ex){
+            throw new Exception(ex.Message);
+        }
+    }
+
 }

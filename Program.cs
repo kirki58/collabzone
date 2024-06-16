@@ -12,7 +12,8 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var frontendOrigin = builder.Configuration["FrontendOrigin"];
+var frontendOrigin = builder.Configuration["FrontendOriginSettings:FrontendOrigin"];
+var frontTest = builder.Configuration["FrontendOriginSettings:FrontendOriginTest"];
 
 //This is for development purposes only. In production, you should use a secure method to store the key.
 if(!File.Exists("key")){
@@ -45,6 +46,7 @@ builder.Services.AddAuthorization();
 
 // Registering settings
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.Configure<FrontendOriginSettings>(builder.Configuration.GetSection("FrontendOriginSettings"));
 
 builder.Services.AddControllers();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -57,8 +59,8 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin", builder =>
     {
-        builder                                 //test environment
-                .WithOrigins(frontendOrigin, "http://localhost:5500")
+        builder
+                .WithOrigins(frontTest)
                .AllowAnyHeader() 
                .AllowAnyMethod()
                .AllowCredentials();
