@@ -32,4 +32,17 @@ public class AuthService
         });
     }
 
+    public static IEnumerable<Claim> DecodeToken(string token){
+        try{
+            var handler = new JwtSecurityTokenHandler();
+            var jwttoken = handler.ReadJwtToken(token);
+
+            //extract claims
+            return jwttoken.Claims;
+        }
+        catch(Exception){
+            throw new Exception("Token cannot be decoded");
+        }
+
+    }
 }

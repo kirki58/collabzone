@@ -22,6 +22,8 @@
 
   <ItemGroup>
     <Folder Include="DBAccess/Repositories/User/" />
+    <Folder Include="Resources/" />
+    <Folder Include="Resources/images/" />
   </ItemGroup>
 
 </Project>

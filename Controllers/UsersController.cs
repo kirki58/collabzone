@@ -96,6 +96,28 @@ public class UsersController : ControllerBase
     }
 
     [Authorize]
+    [HttpGet("get-decoded-token")]
+    public async Task<IActionResult> GetDecodedToken(){
+        try{
+            string token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            var claims = AuthService.DecodeToken(token);
+            if(claims == null){
+                return BadRequest("Invalid token");
+            }
+            return Ok(
+                new {
+                    sub = claims.FirstOrDefault(x => x.Type == "sub")?.Value,
+                    name = claims.FirstOrDefault(x => x.Type == "name")?.Value
+                }
+            );
+        }
+        catch(Exception ex){
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
@@ -127,11 +149,44 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> Update(int id, UpdateUserDTO dto){
         try{
             await _repository.Update(id, dto);
-            return Ok();
+            var token = _authService.GenerateToken(await _repository.GetById(id));
+            return Ok(token);
         }
         catch(Exception ex){
             return BadRequest(ex.Message);
         }
+    }
+
+    [Authorize]
+    [HttpPut("update-password/{id}")]
+    public async Task<IActionResult> UpdatePassword(int id, UpdatePasswordDTO dto){
+        try{
+            var user = await _repository.GetById(id);
+            if(user == null){
+                return NotFound("User not found");
+            }
+
+            if(_passwordHasher.VerifyHashedPassword(user, user.Password_hash, dto.Old_Password) == PasswordVerificationResult.Failed){
+                return Unauthorized("Invalid password");
+            }
+            await _repository.Update(id, new UpdateUserDTO{
+                Password_hash = _passwordHasher.HashPassword(null, dto.New_Password),
+                Name = null,
+                Email = null
+            });
+            
+            var token = _authService.GenerateToken(await _repository.GetById(id));
+            return Ok(token);
+        }
+        catch(Exception ex){
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [Authorize]
+    [HttpGet("is-valid-token")]
+    public Task<IActionResult> IsValidToken(){
+        return Task.FromResult<IActionResult>(Ok());
     }
 
     [HttpPost("login")]
