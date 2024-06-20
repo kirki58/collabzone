@@ -6,6 +6,7 @@ using collabzone.Repositories;
 using collabzone.Services;
 using collabzone.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -49,12 +50,22 @@ builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Emai
 builder.Services.Configure<FrontendOriginSettings>(builder.Configuration.GetSection("FrontendOriginSettings"));
 
 builder.Services.AddControllers();
+
+//Users controller services
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<IVerificationTokenRepository, VerificationTokenRepository>();
 builder.Services.AddTransient<EmailService>();
 
+//Images controller services
+builder.Services.AddScoped<IImageRepository, ImageRepository>();
+
+//Projects controller services
+builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+builder.Services.AddScoped<IUsersProjectRepository, UsersProjectRepository>();
+
+//Confiugre CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin", builder =>

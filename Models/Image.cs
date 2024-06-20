@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace collabzone.Models;
 
@@ -7,7 +8,6 @@ namespace collabzone.Models;
 public class Image : IModel
 {
     [Key]
-    [Required]
     public int Id { get; set; }
     
     [Required]
@@ -19,7 +19,7 @@ public class Image : IModel
     public Guid Guid { get; set; } = Guid.NewGuid();
 
     [Required]
-    [MaxLength(4)]
+    [MaxLength(5)]
     public required string Extension { get; set; }
 
 

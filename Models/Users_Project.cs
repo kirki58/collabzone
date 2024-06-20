@@ -7,7 +7,6 @@ namespace collabzone.Models;
 public class Users_Project : IModel
 {
     [Key]
-    [Required]
     public int Id { get; set; }
 
     [Required]
@@ -18,6 +17,7 @@ public class Users_Project : IModel
     [ForeignKey("Project")]
     public int Project_id { get; set; }
 
+    [Required]
     public bool Is_Admin { get; set; }
 
     public DateTime Joined_At { get; set; } = DateTime.Now;
