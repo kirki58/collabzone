@@ -111,4 +111,14 @@ public class UserRepository : BaseRepository<CZContext>, IUserRepository
         }
     }
 
+    public async Task<List<User>> GetUsersById(List<int> userIds)
+    {
+        try{
+            var users = await _context.Users.Where(x => userIds.Contains(x.Id)).ToListAsync();
+            return users;
+        }
+        catch(Exception ex){
+            throw new Exception(ex.Message);
+        }
+    }
 }

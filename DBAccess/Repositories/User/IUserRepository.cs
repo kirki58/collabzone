@@ -11,4 +11,5 @@ public interface IUserRepository : IRepository<User>
 
     Task<User?> GetByEmail(string email);
     Task<User?> GetByName(string name);
+    Task<List<User>> GetUsersById(List<int> userIds);
 }

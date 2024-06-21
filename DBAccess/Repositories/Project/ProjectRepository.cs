@@ -49,8 +49,53 @@ public class ProjectRepository : BaseRepository<CZContext>, IProjectRepository
         throw new NotImplementedException();
     }
 
-    public Task<Project> GetById(int id)
+    public async Task<Project> GetById(int id)
     {
-        throw new NotImplementedException();
+        try{
+            var project = await _context.FindAsync<Project>(id);
+            if(project == null){
+                throw new Exception("Project not found");
+            }
+            return project;
+        }
+        catch(Exception ex){
+            throw new Exception(ex.Message);
+        }
+    }
+
+    public async Task<List<Project>> GetProjectsById(List<int> projectIds)
+    {
+        try{
+            var projects = await _context.Projects.Where(p => projectIds.Contains(p.Id)).ToListAsync();
+            return projects;
+        }
+        catch(Exception ex){
+            throw new Exception(ex.Message);
+        }
+    }
+
+    public async Task<Project> Update(int id, UpdateProjectDTO dto)
+    {
+        try{
+            var project = await _context.Projects.FindAsync(id);
+            if(project == null){
+                throw new Exception("Project not found");
+            }
+            project.Name = dto.Name ?? project.Name;
+            
+            if(dto.Invite_guid){
+                project.Invite_guid = Guid.NewGuid();
+            }
+
+            _context.Projects.Update(project);
+            int rowsAffected = await _context.SaveChangesAsync();
+            if(rowsAffected == 0){
+                throw new Exception("Failed to update project");
+            }
+            return project;
+        }
+        catch(Exception ex){
+            throw new Exception(ex.Message);
+        }
     }
 }

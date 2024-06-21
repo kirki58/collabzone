@@ -64,6 +64,7 @@ builder.Services.AddScoped<IImageRepository, ImageRepository>();
 //Projects controller services
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IUsersProjectRepository, UsersProjectRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 //Confiugre CORS
 builder.Services.AddCors(options =>
