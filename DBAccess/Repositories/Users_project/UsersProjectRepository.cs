@@ -31,6 +31,7 @@ public class UsersProjectRepository : BaseRepository<CZContext>, IUsersProjectRe
             throw new Exception(e.Message);
         }
     }
+    
 
     public Task Delete(int id)
     {
@@ -100,6 +101,59 @@ public class UsersProjectRepository : BaseRepository<CZContext>, IUsersProjectRe
                 .ToListAsync();
             
             return collabs;
+        }
+        catch(Exception e){
+            throw new Exception(e.Message);
+        }
+    }
+
+    public async Task BanUser(int user_id, int project_id)
+    {
+        try{
+            var userProject = await _context.Users_Projects
+                .FirstOrDefaultAsync(up => up.User_id == user_id && up.Project_id == project_id);
+            if(userProject == null){
+                throw new Exception("User project not found");
+            }
+            _context.Users_Projects.Remove(userProject);
+            int rowsAffected = await _context.SaveChangesAsync();
+            if(rowsAffected == 0){
+                throw new Exception("Failed to ban user");
+            }
+        }
+        catch(Exception e){
+            throw new Exception(e.Message);
+        }
+    }
+
+    public async Task ChangeAdmin(int user_id, int project_id)
+    {
+        try{
+            var userProject = await _context.Users_Projects
+                .FirstOrDefaultAsync(up => up.User_id == user_id && up.Project_id == project_id);
+            if(userProject == null){
+                throw new Exception("User project not found");
+            }
+            userProject.Is_Admin = !userProject.Is_Admin;
+            int rowsAffected = await _context.SaveChangesAsync();
+            if(rowsAffected == 0){
+                throw new Exception("Failed to change admin status");
+            }
+        }
+        catch(Exception e){
+            throw new Exception(e.Message);
+        }
+    }
+
+    public async Task<bool> is_in_project(int user_id, int project_id)
+    {
+        try{
+            var userProject = await _context.Users_Projects
+                .FirstOrDefaultAsync(up => up.User_id == user_id && up.Project_id == project_id);
+            if(userProject == null){
+                return false;
+            }
+            return true;
         }
         catch(Exception e){
             throw new Exception(e.Message);

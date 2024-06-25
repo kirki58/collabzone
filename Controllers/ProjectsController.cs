@@ -170,4 +170,62 @@ public class ProjectsController : ControllerBase
         }
     }
 
+    [Authorize]
+    [HttpDelete("ban-user")]
+    public async Task<IActionResult> BanUser([FromBody] user_project_id_pair pair){
+        try{
+            var project = await _projectRepository.GetByGuid(pair.project_guid);
+            var claims = AuthService.DecodeToken(Request.Headers["Authorization"].ToString().Split(" ")[1]);
+            var sub = claims.FirstOrDefault(c => c.Type == "sub").Value;
+            if (!await _usersProjectRepository.is_admin(int.Parse(sub), project.Id))
+            {
+                return Unauthorized();
+            }
+            await _usersProjectRepository.BanUser(pair.user_id, project.Id);
+            return Ok();
+        }
+        catch(Exception ex){
+            return BadRequest(ex.Message);
+        }
+    }
+    
+    [Authorize]
+    [HttpPut("change-admin")]
+    public async Task<IActionResult> ChangeAdmin([FromBody] user_project_id_pair pair){
+        try{
+            var project = await _projectRepository.GetByGuid(pair.project_guid);
+            var claims = AuthService.DecodeToken(Request.Headers["Authorization"].ToString().Split(" ")[1]);
+            var sub = claims.FirstOrDefault(c => c.Type == "sub").Value;
+            if (!await _usersProjectRepository.is_admin(int.Parse(sub), project.Id))
+            {
+                return Unauthorized();
+            }
+            await _usersProjectRepository.ChangeAdmin(pair.user_id, project.Id);
+            return Ok();
+        }
+        catch(Exception ex){
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [Authorize]
+    [HttpGet("am-i-in/{guid}")]
+    public async Task<IActionResult> AmIIn(Guid guid){
+        try{
+            var claims = AuthService.DecodeToken(Request.Headers["Authorization"].ToString().Split(" ")[1]);
+            var sub = claims.FirstOrDefault(c => c.Type == "sub").Value;
+            var project = await _projectRepository.GetByGuid(guid);
+            bool userProject = await _usersProjectRepository.is_in_project(int.Parse(sub), project.Id);
+            if(userProject){
+                return Ok();
+            }
+            return NotFound();
+        }
+        catch(Exception ex){
+            return BadRequest(ex.Message);
+        }
+    }
+
 }
+
+public record user_project_id_pair(int user_id, Guid project_guid);

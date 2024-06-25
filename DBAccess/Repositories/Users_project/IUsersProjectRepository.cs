@@ -8,6 +8,9 @@ public interface IUsersProjectRepository : IRepository<Users_Project>
     Task Create(CreateUsersProjectDTO dto);
     Task<List<int>> GetProjectIDs(int user_id);
     Task<bool> is_admin(int user_id, int project_id);
+    Task<bool> is_in_project(int user_id, int project_id);
     Task<List<int>> GetAdmins(int project_id);
     Task<List<int>> GetCollabs(int project_id);
+    Task BanUser(int user_id, int project_id);
+    Task ChangeAdmin(int user_id, int project_id);
 }
