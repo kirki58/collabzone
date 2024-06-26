@@ -226,6 +226,18 @@ public class ProjectsController : ControllerBase
         }
     }
 
+    [Authorize]
+    [HttpGet("id/{id}")]
+    public async Task<IActionResult> GetProjectById(int id){
+        try{
+            var project = await _projectRepository.GetById(id);
+            return Ok(project);
+        }
+        catch(Exception ex){
+            return BadRequest(ex.Message);
+        }
+    }
+
 }
 
 public record user_project_id_pair(int user_id, Guid project_guid);

@@ -25,4 +25,8 @@ public class UserTask : IModel
 
     [Required]
     public required string Description { get; set; }
+
+    [Required]
+    [ForeignKey("User")]
+    public int Given_to { get; set; }
 }

@@ -117,20 +117,20 @@ public class UsersController : ControllerBase
         }
     }
 
-    [Authorize]
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
-    {
-        try
-        {
-            await _repository.Delete(id);
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
-    }
+    // [Authorize]
+    // [HttpDelete("{id}")]
+    // public async Task<IActionResult> Delete(int id)
+    // {
+    //     try
+    //     {
+    //         await _repository.Delete(id);
+    //         return Ok();
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         return BadRequest(ex.Message);
+    //     }
+    // }
 
     [Authorize]
     [HttpGet("{id}")]

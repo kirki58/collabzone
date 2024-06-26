@@ -66,6 +66,9 @@ builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IUsersProjectRepository, UsersProjectRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
+//Tasks controller services
+builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+
 //Confiugre CORS
 builder.Services.AddCors(options =>
 {
