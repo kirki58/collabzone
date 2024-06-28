@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using collabzone.DBAccess.Context;
 using collabzone.DBAccess.Repositories;
+using collabzone.Hubs;
 using collabzone.Models;
 using collabzone.Repositories;
 using collabzone.Services;
@@ -50,6 +51,7 @@ builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Emai
 builder.Services.Configure<FrontendOriginSettings>(builder.Configuration.GetSection("FrontendOriginSettings"));
 
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
 
 //Users controller services
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -99,5 +101,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<ProjectChatHub>("/projectChatHub");
 
 app.Run();
